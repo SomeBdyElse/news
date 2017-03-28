@@ -11,6 +11,9 @@ return [
         'tstamp' => 'tstamp',
         'crdate' => 'crdate',
         'cruser_id' => 'cruser_id',
+        'languageField' => 'sys_language_uid',
+        'transOrigPointerField' => 'l10n_parent',
+        'transOrigDiffSourceField' => 'l10n_diffsource',
         'default_sortby' => 'ORDER BY title',
         'delete' => 'deleted',
         'enablecolumns' => [
@@ -22,7 +25,7 @@ return [
         'searchFields' => 'uid,title',
     ],
     'interface' => [
-        'showRecordFieldList' => 'hidden,title'
+        'showRecordFieldList' => 'sys_language_uid,l10n_parent,l10n_diffsource,hidden,title'
     ],
     'columns' => [
         'pid' => [
@@ -43,6 +46,38 @@ return [
                 'type' => 'passthrough',
             ]
         ],
+        'sys_language_uid' => array(
+            'exclude' => 1,
+            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.language',
+            'config' => array(
+                'type' => 'select',
+                'foreign_table' => 'sys_language',
+                'foreign_table_where' => 'ORDER BY sys_language.title',
+                'items' => array(
+                    array('LLL:EXT:lang/locallang_general.xlf:LGL.allLanguages', -1),
+                    array('LLL:EXT:lang/locallang_general.xlf:LGL.default_value', 0)
+                )
+            )
+        ),
+        'l10n_parent' => array(
+            'displayCond' => 'FIELD:sys_language_uid:>:0',
+            'exclude' => 1,
+            'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.l18n_parent',
+            'config' => array(
+                'type' => 'select',
+                'items' => array(
+                    array('', 0),
+                ),
+                'foreign_table' => 'tx_news_domain_model_tag',
+                'foreign_table_where' => 'AND tx_news_domain_model_tag.pid=###CURRENT_PID### AND tx_news_domain_model_tag.sys_language_uid IN (-1,0)',
+            )
+        ),
+        'l10n_diffsource' => array(
+            'config' => array(
+                'type' => 'passthrough',
+                'default' => ''
+            )
+        ),
         'hidden' => [
             'exclude' => true,
             'label' => 'LLL:EXT:lang/locallang_general.xlf:LGL.hidden',
@@ -57,7 +92,7 @@ return [
             'config' => [
                 'type' => 'input',
                 'size' => 30,
-                'eval' => 'required,unique,trim',
+                'eval' => 'required,trim',
             ]
         ],
         'seo_headline' => [
@@ -109,7 +144,7 @@ return [
     ],
     'palettes' => [
         'paletteCore' => [
-            'showitem' => 'hidden,',
+            'showitem' => 'hidden,sys_language_uid,l10n_parent,l10n_diffsource,',
         ],
     ]
 ];
